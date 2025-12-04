@@ -1,4 +1,4 @@
-use crate::grid::{Grid, Input, generate_input};
+use advent_grid::{Grid, Input, generate_input};
 
 #[aoc_generator(day4)]
 pub fn input_generator(in_lines: &str) -> Input {

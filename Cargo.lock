@@ -3,9 +3,18 @@
 version = 3
 
 [[package]]
+name = "advent-grid"
+version = "0.1.0"
+source = "git+https://github.com/djrideout/advent-grid.git#2163d1bbbb9b17197c1d59e7e609bd14557e0ca5"
+dependencies = [
+ "regex",
+]
+
+[[package]]
 name = "advent2025"
 version = "0.1.0"
 dependencies = [
+ "advent-grid",
  "aoc-runner",
  "aoc-runner-derive",
  "regex",
