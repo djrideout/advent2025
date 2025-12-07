@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 #[aoc(day7, part1)]
 pub fn solve_part1(input: &str) -> usize {
     let start = input.find("S").unwrap();
@@ -17,4 +19,28 @@ pub fn solve_part1(input: &str) -> usize {
         beams.dedup();
     }
     count
+}
+
+fn split(input: &str, line_num: usize, pos: usize, cache: &mut HashMap<(usize, usize), usize>) -> usize {
+    let key = (line_num, pos);
+    if cache.contains_key(&key) {
+        return *cache.get(&key).unwrap();
+    }
+    let l = input.lines().nth(line_num);
+    if l.is_none() {
+        return 1;
+    }
+    if l.unwrap().chars().nth(pos).unwrap() != '^' {
+        return split(input, line_num + 2, pos, cache);
+    }
+    let timelines = split(input, line_num + 2, pos - 1, cache)
+        + split(input, line_num + 2, pos + 1, cache);
+    cache.insert(key, timelines);
+    timelines
+}
+
+#[aoc(day7, part2)]
+pub fn solve_part2(input: &str) -> usize {
+    let start = input.find("S").unwrap();
+    split(input, 2, start, &mut HashMap::new())
 }
