@@ -2,11 +2,10 @@ use std::collections::{HashSet, VecDeque};
 
 use regex::Regex;
 
-// the usizes being which lights the button will toggle
 type Button = Vec<usize>;
 
 pub struct Machine {
-    target: Vec<bool>,
+    lights: Vec<bool>,
     buttons: Vec<Button>,
     joltages: Vec<usize>
 }
@@ -20,7 +19,7 @@ pub fn input_generator(in_lines: &str) -> Input {
     let joltages_re = regex::Regex::new(r"\{([^}]*)\}").unwrap();
     let mut machines = vec![];
     for l in in_lines.lines() {
-        let target = lights_re
+        let lights = lights_re
             .find_iter(l)
             .map(|m| m.as_str() == "#")
             .collect();
@@ -43,7 +42,7 @@ pub fn input_generator(in_lines: &str) -> Input {
             })
             .collect();
         machines.push(Machine {
-            target,
+            lights,
             buttons,
             joltages,
         });
@@ -51,7 +50,7 @@ pub fn input_generator(in_lines: &str) -> Input {
     machines
 }
 
-fn least_presses(target: &Vec<bool>, buttons: &Vec<Button>) -> usize {
+fn least_presses_lights(target: &Vec<bool>, buttons: &Vec<Button>) -> usize {
     let mut cache = HashSet::new();
     let mut q = VecDeque::new();
     q.push_back((vec![false; target.len()], 0));
@@ -74,7 +73,35 @@ fn least_presses(target: &Vec<bool>, buttons: &Vec<Button>) -> usize {
     0
 }
 
+fn least_presses_joltage(target: &Vec<usize>, buttons: &Vec<Button>) -> usize {
+    let mut matrix = vec![];
+    for (i, t) in target.iter().enumerate() {
+        let mut line = vec![];
+        for b in buttons {
+            line.push(b.contains(&i) as usize);
+        }
+        line.push(*t);
+        matrix.push(line);
+    }
+
+    // I either need to solve this system of linear equations,
+    // or go back to the breadth-first-search method with better pruning somehow.
+
+    // Example system of linear equations for first demo machine:
+    // 0A + 0B + 0C + 0D + 1E + 1F = 3
+    // 0A + 1B + 0C + 0D + 0E + 1F = 5
+    // 0A + 0B + 1C + 1D + 1E + 0F = 4
+    // 1A + 1B + 0C + 1D + 0E + 0F = 7
+
+    0
+}
+
 #[aoc(day10, part1)]
 pub fn solve_part1(input: &Input) -> usize {
-    input.iter().fold(0, |acc, m| acc + least_presses(&m.target, &m.buttons))
+    input.iter().fold(0, |acc, m| acc + least_presses_lights(&m.lights, &m.buttons))
+}
+
+#[aoc(day10, part2)]
+pub fn solve_part2(input: &Input) -> usize {
+    input.iter().fold(0, |acc, m| acc + least_presses_joltage(&m.joltages, &m.buttons))
 }
