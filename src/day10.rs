@@ -1,4 +1,4 @@
-use std::collections::VecDeque;
+use std::collections::{HashSet, VecDeque};
 
 use regex::Regex;
 
@@ -52,10 +52,12 @@ pub fn input_generator(in_lines: &str) -> Input {
 }
 
 fn least_presses(target: &Vec<bool>, buttons: &Vec<Button>) -> usize {
+    let mut cache = HashSet::new();
     let mut q = VecDeque::new();
     q.push_back((vec![false; target.len()], 0));
     while q.len() > 0 {
         let (state, presses) = q.pop_front().unwrap();
+        cache.insert(state.clone());
         if state.eq(target) {
             return presses;
         }
@@ -64,7 +66,9 @@ fn least_presses(target: &Vec<bool>, buttons: &Vec<Button>) -> usize {
             for i in button {
                 next_state[*i] = !next_state[*i];
             }
-            q.push_back((next_state, presses + 1));
+            if !cache.contains(&next_state) {
+                q.push_back((next_state, presses + 1));
+            }
         }
     }
     0
